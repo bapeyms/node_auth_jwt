@@ -4,12 +4,14 @@ import { Category } from './entities/category.entity.js';
 import { Repository } from 'typeorm';
 import { CategoryCreateReqDto } from './dtos/category_create.req.dto.js';
 import { CategoryGetResDto } from './dtos/category_get.res.dto.js';
+import { RedisService } from '../redis/redis.service.js';
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectRepository(Category)
     private readonly _repository: Repository<Category>,
+    private readonly _redisService: RedisService,
   ) {}
 
   async create(dto: CategoryCreateReqDto): Promise<CategoryGetResDto> {
@@ -43,6 +45,25 @@ export class CategoryService {
         parent_id: c.parent_id,
       });
     });
+    return result;
+  }
+
+  async findAllWithRedis(): Promise<CategoryGetResDto[]> {
+    const cacheKey = 'categories:all';
+    const cachedData = await this._redisService.get(cacheKey);
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
+
+    const categories = await this._repository.find();
+    const result: CategoryGetResDto[] = categories.map((c: Category) => ({
+      id: c.id,
+      title: c.title,
+      slug: c.slug,
+      image: c.image ?? '',
+      parent_id: c.parent_id,
+    }));
+    await this._redisService.set(cacheKey, JSON.stringify(result), 60);
     return result;
   }
 

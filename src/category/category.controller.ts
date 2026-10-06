@@ -98,6 +98,7 @@ export class CategoryController {
   @Get()
   async getAllCategory(): Promise<CategoryGetResDto[]> {
     return await this.categoryService.findAll();
+    //return await this.categoryService.findAllWithRedis();
   }
 
   // @Get(':id')

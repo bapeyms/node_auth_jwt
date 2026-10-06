@@ -8,6 +8,7 @@ import { UserModule } from './user/user.module.js';
 import { RoleModule } from './role/role.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { ProductModule } from './product/product.module.js';
+import { RedisModule } from './redis/redis.modules.js';
 
 @Module({
   exports: [TypeOrmModule],
@@ -32,6 +33,7 @@ import { ProductModule } from './product/product.module.js';
     RoleModule,
     AuthModule,
     ProductModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],
